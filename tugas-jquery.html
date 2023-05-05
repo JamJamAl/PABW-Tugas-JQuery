@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Data Pokemon</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Data Pokemon</h1>
+    <table id="pokemon">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Nama</th>
+          <th>Tipe</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      $(document).ready(function () {
+        // Endpoint untuk daftar Pokemon
+        var api_url = "https://pokeapi.co/api/v2/pokemon?limit=20";
+
+        // Buat permintaan AJAX untuk mengambil data
+        $.ajax({
+          url: api_url,
+          method: "GET",
+          success: function (data) {
+            // Setelah data diterima, tambahkan ke tabel HTML
+            var table_body = $("#pokemon tbody");
+            data.results.forEach(function (pokemon, index) {
+              var pokemon_url = pokemon.url;
+              var pokemon_number = index + 1;
+              // Buat permintaan AJAX untuk mendapatkan detail Pokemon
+              $.ajax({
+                url: pokemon_url,
+                method: "GET",
+                success: function (pokemon_data) {
+                  var types = [];
+                  pokemon_data.types.forEach(function (type_data) {
+                    types.push(type_data.type.name);
+                  });
+                  var row =
+                    "<tr>" +
+                    "<td>" +
+                    pokemon_number +
+                    "</td>" +
+                    "<td>" +
+                    pokemon_data.name +
+                    "</td>" +
+                    "<td>" +
+                    types.join(", ") +
+                    "</td>" +
+                    "</tr>";
+                  table_body.append(row);
+                },
+                error: function (xhr, status, error) {
+                  console.error(status + ": " + error);
+                },
+              });
+            });
+          },
+          error: function (xhr, status, error) {
+            console.error(status + ": " + error);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
